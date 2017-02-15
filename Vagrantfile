@@ -18,7 +18,7 @@ then
 fi
 SETHOSTS
 $git_use_https= <<USEHTTPS
-apt-get install -y git
+apt install -y git
 /usr/bin/git config --system url."https://github.com/".insteadOf git@github.com:
 /usr/bin/git config --system url."https://".insteadOf git://
 USEHTTPS
@@ -58,6 +58,7 @@ def configure_vm(name, vm, conf)
 
   # puppet provisioning
   vm.provision "puppet" do |puppet|
+    puppet.environment_path = "puppet/environment"
     puppet.manifests_path = "puppet/manifests"
     puppet.module_path = "puppet/modules"
     puppet.manifest_file = "default.pp"
@@ -104,10 +105,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # The boot time is long for these, so I recommend that you convert to a local
   # version as soon as you can.
   config.vm.box = conf['box_name'] || 'ubuntu/trusty64'
+  config.vm.box_version = conf['box_version'] if conf['box_version']
   config.vm.box_url = conf['box_url'] if conf['box_url']
 
   if Vagrant.has_plugin?("vagrant-cachier")
     config.cache.scope = :box
+    # config.cache.synced_folder_opts = {
+    #   owner: "_apt",
+    #   group: "_apt"
+    # }
   end
 
   if Vagrant.has_plugin?("vagrant-proxyconf") && conf['proxy']
@@ -130,7 +136,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.hostmanager.ip_resolver = proc do |machine|
         result = ""
         begin
-          machine.communicate.execute("ifconfig eth1") do |type, data|
+          machine.communicate.execute("ifconfig enp0s8") do |type, data|
             result << data if type == :stdout
           end
         # NOTE(jerryz): This catches the exception when host is still
@@ -146,7 +152,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define "manager", primary: true do |manager|
     configure_vm("manager", manager.vm, conf)
-    manager.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
+    manager.vm.network "forwarded_port", guest: 80, host: 18080, host_ip: "127.0.0.1"
     manager.vm.network "forwarded_port", guest: 6080, host: 6080, host_ip: "127.0.0.1"
   end
 

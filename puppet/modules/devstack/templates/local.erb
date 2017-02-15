@@ -18,8 +18,8 @@ DATABASE_TYPE=mysql
 
 # networking configuration parameters
 
-GUEST_INTERFACE_DEFAULT=eth1
-HOST_IP_IFACE=eth1
+GUEST_INTERFACE_DEFAULT=enp0s8
+HOST_IP_IFACE=enp0s8
 
 # logging configuration parameters
 
@@ -64,5 +64,5 @@ enable_service ldap
 
 [[post-config|$NOVA_CONF]]
 [DEFAULT]
-flat_interface = eth1
-vlan_interface = eth1
+flat_interface = enp0s8
+vlan_interface = enp0s8

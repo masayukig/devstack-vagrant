@@ -4,6 +4,8 @@ echo "Running local.sh"
 
 set -o xtrace
 
+unset OS_USER_DOMAIN_ID
+unset OS_PROJECT_DOMAIN_ID
 openrc=/home/stack/devstack/openrc
 authorized_keys_file=/home/stack/.ssh/authorized_keys
 
